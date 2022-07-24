@@ -6,12 +6,26 @@ import {
   MonthlyWage,
 } from "../components/conditions/WageRange";
 import Navbar from "../components/Navbar";
-import { ChangeEvent, useEffect, useState } from "react";
-import locationData from "../data/location";
+import {
+  ChangeEvent,
+  HTMLInputTypeAttribute,
+  useEffect,
+  useState,
+} from "react";
 import WorkingArea from "../components/conditions/WorkingArea";
+import CSS from "csstype";
+import { jobList, JOBLIST } from "../data/joblist";
+export interface SearchCondition {
+  zipcode: number | null;
+  province: string | null;
+  district: string | null;
+  amphoe: string | null;
+  job_type: number | null;
+}
 
 function EmployeesPage() {
   const [wageType, setWageType] = useState("hourly");
+  const [job, setJob] = useState<JOBLIST[]>([]);
 
   const handleWageType = (e: ChangeEvent<HTMLSelectElement>) => {
     setWageType(e.target.value);
@@ -34,38 +48,118 @@ function EmployeesPage() {
     }
   };
   useEffect(() => {}, [wageType]);
+  const textAreaStyle: CSS.Properties = {
+    boxShadow: "0 0 2pt grey",
+  };
+  const handleSubmit = () => {
+    console.log(jobList);
+    const ZipCode: string = (
+      document.getElementById("ZipCode") as HTMLInputElement
+    )?.value;
+    const Province: string = (
+      document.getElementById("Province") as HTMLSelectElement
+    )?.value;
+
+    const Amphoe: string = (
+      document.getElementById("SubDistrict") as HTMLSelectElement
+    )?.value;
+    const District: string = (
+      document.getElementById("District") as HTMLSelectElement
+    )?.value;
+    const JobType: string = (
+      document.getElementById("job_type") as HTMLSelectElement
+    )?.value;
+    console.log(parseInt(ZipCode));
+    console.log(Province);
+    console.log(Amphoe);
+    console.log(District);
+    console.log(parseInt(JobType));
+    const inputData: SearchCondition = {
+      zipcode: parseInt(ZipCode),
+      province: Province,
+      district: District,
+      amphoe: Amphoe,
+      job_type: parseInt(JobType),
+    };
+    const findJob = jobList.filter(
+      (job) =>
+        job.zipcode === inputData.zipcode &&
+        job.province === inputData.province &&
+        job.job_type === inputData.job_type
+    );
+    console.log(findJob);
+    setJob(findJob);
+  };
   return (
     <>
       <Navbar />
+      <div className="text-3xl">
+        &lt; DEMO Work ทำไว้แค่สองชุด ใส่รหัสปณ 11120 สลับประเภทงาน ก ข &gt;
+      </div>
       <div>
         <div>ผู้ต้องการหางาน</div>
-        <div className="flex flex-row">
-          <div className="flex flex-row">
-            <div>ประเภทค่าจ้าง</div>
-            <select
-              name="wage_types"
-              id="wage_types"
-              onChange={(e) => handleWageType(e)}
-            >
-              <option value="hourly">รายชั่วโมง</option>
-              <option value="daily">รายวัน</option>
-              <option value="weekly">รายสัปดาห์</option>
-              <option value="biweekly">รายสองสัปดาห์</option>
-              <option value="monthly">รายเดือน</option>
-            </select>
-            <div>Expected Wage</div>
-            <RenderWageRange />
+        <div className="">
+          <div className="flex px-4">
+            <div>
+              <span className="px-2">ประเภทค่าจ้าง</span>
+              <select
+                name="wage_types"
+                id="wage_types"
+                onChange={(e) => handleWageType(e)}
+                className="rounded-md outline-none border-none"
+                style={textAreaStyle}
+              >
+                <option value="hourly">รายชั่วโมง</option>
+                <option value="daily">รายวัน</option>
+                <option value="weekly">รายสัปดาห์</option>
+                <option value="biweekly">รายสองสัปดาห์</option>
+                <option value="monthly">รายเดือน</option>
+              </select>
+            </div>
+            <div className="flex px-4">
+              <span className="px-2">ค่าแรงที่ประสงค์</span>
+              <RenderWageRange />
+            </div>
           </div>
           <div>
-            <div>Working Area</div>
+            <div>สถานที่ทำงาน</div>
             <WorkingArea />
           </div>
-          <div>
-            <div>Job fields</div>
-            <div>Job fields input</div>
+          <div className="flex">
+            <span className="px-2">ประเภทงาน</span>
+            <select
+              name="job_type"
+              id="job_type"
+              className="rounded-md outline-none border-none"
+              style={textAreaStyle}
+            >
+              <option value="1">ก</option>
+              <option value="2">ข</option>
+              <option value="3">ค</option>
+              <option value="4">ง</option>
+            </select>
           </div>
         </div>
       </div>
+      <button
+        onClick={handleSubmit}
+        className="bg-blue-300 p-2 rounded-full hover:opacity-70 "
+      >
+        Search
+      </button>
+      {/* งาน */}
+      {job &&
+        job.map((j) => {
+          return (
+            <div>
+              <div>ชื่อบริษัท{j.company_name}</div>
+              <div>รายละเอียดงาน {j.job_description}</div>
+              <div>ค่าแรง:{j.wage}</div>
+              <div>{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} คำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
+              <div></div>
+            </div>
+          );
+        })}
     </>
   );
 }

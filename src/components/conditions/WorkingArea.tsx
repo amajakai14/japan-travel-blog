@@ -1,11 +1,16 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import locationData from "../../data/location";
 import { province_th } from "../../data/province";
-
-function WorkingArea() {
+import CSS from "csstype";
+import { SearchCondition } from "../../pages/employees";
+interface SearchProps {
+  search: SearchCondition;
+  setSearch: any;
+}
+const WorkingArea: FC = (): JSX.Element => {
   const [provinces, setProvinces] = useState<string[]>(province_th);
   const [districts, setDistricts] = useState<string[]>([]);
-  const [subDistricts, setSubDistricts] = useState<string[]>([]);
+  const [amphoe, setAmphoe] = useState<string[]>([]);
   const handleZipCode = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.match(/(?:^|\D)(\d{5})(?!\d)/g)) {
       // search for location detail
@@ -14,6 +19,7 @@ function WorkingArea() {
       //do not thing
       setProvinces(province_th);
       setDistricts([]);
+      setAmphoe([]);
       console.log("notmatch");
     }
   };
@@ -23,13 +29,18 @@ function WorkingArea() {
     console.log(areaFound);
     if (areaFound.length !== 0) {
       setProvinces([areaFound[0]!.province]);
+      let amphoeArray: string[] = [];
+      let districtArray: string[] = [];
       areaFound.map((area) => {
-        console.log(districts);
-        setDistricts((arr) => [...arr, area.district]);
+        amphoeArray = [...amphoeArray, area.amphoe];
+        districtArray = [...districtArray, area.district];
       });
+      setAmphoe(distinctArray(amphoeArray));
+      setDistricts(distinctArray(districtArray));
     } else {
       setProvinces(province_th);
       setDistricts([]);
+      setAmphoe([]);
     }
   };
 
@@ -52,42 +63,69 @@ function WorkingArea() {
     );
   };
 
-  const subDistrictComponent = (subDistricts: string[]) => {
-    if (subDistricts.length === 0) return <option></option>;
-    const distinctDistrict = subDistricts.filter(
-      (subDistrict, index) => subDistricts.indexOf(subDistrict) === index
+  const handleProvince = (e: ChangeEvent<HTMLElement>) => {
+    const getProvinces = distinctArray(
+      locationData.map((elem) => elem.province)
+    );
+    console.log(getProvinces);
+
+    const selectedDistrict = e.target as HTMLSelectElement;
+    console.log("province", selectedDistrict.value);
+    const amphoeFound = locationData.filter(
+      (elem) => elem.province === selectedDistrict.value
     );
 
-    return (
-      <>
-        {distinctDistrict.map((district, index) => {
-          return (
-            <option key={index} value={district}>
-              {district}
-            </option>
-          );
-        })}
-      </>
+    const amphoeArray: string[] = distinctArray(
+      amphoeFound.map((amp) => amp.amphoe)
     );
+    console.log(amphoeArray);
+    setAmphoe(amphoeArray);
+  };
+  const handleDistrict = (e: ChangeEvent<HTMLElement>) => {
+    const selectedAmphoe = e.target as HTMLSelectElement;
+    const districtFound = locationData.filter(
+      (elem) => elem.amphoe === selectedAmphoe.value
+    );
+    console.log(districtFound);
+    const districtsArray = districtFound.map((obj) => obj.district);
+    setDistricts(districtsArray);
+  };
+
+  function distinctArray(inputArray: string[]) {
+    return inputArray.filter(
+      (child, index) => inputArray.indexOf(child) === index
+    );
+  }
+
+  const textAreaStyle: CSS.Properties = {
+    boxShadow: "0 0 2pt grey",
   };
 
   return (
     <div>
       {/* condition */}
-      <div>
-        <div>ประเทศไทย</div>
-        <div>
-          <div>เลขที่ไปรษณีย์</div>
+      <div className="flex flex-col">
+        <span>ประเทศไทย</span>
+        <div className="flex p-1">
+          <div className="px-2">เลขที่ไปรษณีย์</div>
           <input
             onChange={(e) => handleZipCode(e)}
             name="ZipCode"
             id="ZipCode"
             type="number"
+            className="rounded-md outline-none border-none"
+            style={textAreaStyle}
           />
         </div>
-        <div>
-          <div>จังหวัด</div>
-          <select name="Province" id="Province">
+        <div className="flex p-1">
+          <div className="px-2">จังหวัด</div>
+          <select
+            name="Province"
+            id="Province"
+            onChange={(e) => handleProvince(e)}
+            className="rounded-md outline-none border-none"
+            style={textAreaStyle}
+          >
             {provinces.map((province, index) => {
               return (
                 <option key={index} value={province}>
@@ -97,22 +135,49 @@ function WorkingArea() {
             })}
           </select>
         </div>
-        <div>
-          <div>เขต/ตำบล</div>
-          <select name="District" id="District">
+        <div className="flex p-1">
+          <div className="px-2">แขวง/อำเภอ</div>
+          <select
+            name="SubDistrict"
+            id="SubDistrict"
+            onChange={(e) => handleDistrict(e)}
+            className="rounded-md outline-none border-none"
+            style={textAreaStyle}
+          >
+            {amphoe &&
+              amphoe.map((amp, index) => {
+                return (
+                  <option key={`amphoe_${index}`} value={amp}>
+                    {amp}
+                  </option>
+                );
+              })}
+          </select>
+        </div>
+        <div className="flex p-1">
+          <div className="px-2">เขต/ตำบล</div>
+          <select
+            name="District"
+            id="District"
+            className="rounded-md outline-none border-none"
+            style={textAreaStyle}
+          >
             {districts && districtComponent(districts)}
           </select>
         </div>
-        <div>
-          <div>แขวง/อำเภอ</div>
-          <select name="SubDistrict" id="SubDistrict"></select>
-        </div>
-        <input type="textarea" />
+        {/* <div className="flex p-1">
+          <span className="px-2">ที่อยู่อาศัย</span>
+          <input
+            type="textarea"
+            className="rounded-md outline-none border-none"
+            style={textAreaStyle}
+          />
+        </div> */}
       </div>
 
       {/* Workplace */}
     </div>
   );
-}
+};
 
 export default WorkingArea;
