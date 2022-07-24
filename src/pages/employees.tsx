@@ -148,6 +148,7 @@ function EmployeesPage() {
         Search
       </button>
       {/* งาน */}
+      {job.length === 0 ? <div>Work not Found!</div> : <div>Found a Job!</div>}
       {job &&
         job.map((j) => {
           return (
@@ -155,7 +156,7 @@ function EmployeesPage() {
               <div>ชื่อบริษัท{j.company_name}</div>
               <div>รายละเอียดงาน {j.job_description}</div>
               <div>ค่าแรง:{j.wage}</div>
-              <div>{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} คำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
+              <div>{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} ตำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
               <div></div>
             </div>
           );

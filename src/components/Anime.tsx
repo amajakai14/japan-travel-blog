@@ -1,4 +1,5 @@
 import Axios, { AxiosRequestConfig } from "axios";
+import Image from "next/image";
 import { title } from "process";
 import { useEffect, useState } from "react";
 import StarsRating from "react-star-rate";
@@ -90,7 +91,7 @@ const Anime = () => {
                     <div key={`title_${index}`}>{item.title_japanese}</div>
                   )}
 
-                  <img
+                  <Image
                     src={item.images.jpg.image_url}
                     key={`img_${index}`}
                     width="100"
@@ -114,8 +115,9 @@ const Anime = () => {
                     key={`animelist_${index}`}
                     target="_blank"
                     className="mx-auto "
+                    rel="noreferrer"
                   >
-                    <img
+                    <Image
                       alt="MyAnimeList Logo.png"
                       src="../../static/MyAnimeList_Logo.png"
                       width="100"
@@ -123,10 +125,15 @@ const Anime = () => {
                       data-image-name="MyAnimeList Logo.png"
                       data-image-key="MyAnimeList_Logo.png"
                       className="mx-auto p-2"
-                    ></img>
+                    />
                   </a>
-                  <a href={redditurl} target="_blank" className="mx-auto">
-                    <img
+                  <a
+                    href={redditurl}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="mx-auto"
+                  >
+                    <Image
                       src="../../static/Reddit_logo.svg"
                       alt="reddit-logo"
                       width="100"
