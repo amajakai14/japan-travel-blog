@@ -5,15 +5,25 @@ import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
+import { trpc } from "../utils/trpc";
+import { UserContextProvider } from "../context/user.context";
+import { appWithTranslation, AppWithTranslation } from "next-i18next";
+import Navbar from "../components/Navbar";
 
 const MyApp: AppType = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const { data, error, isLoading } = trpc.useQuery(["users.me"]);
+  if (isLoading) {
+    return <>Loading user ...</>;
+  }
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <UserContextProvider value={data}>
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </UserContextProvider>
   );
 };
 

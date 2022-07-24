@@ -2,13 +2,16 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./db.sqlite"
-    // url      = env("DATABASE_URL")
+    provider             = "mysql"
+    // url      = "file:./db.sqlite"
+    url                  = env("DATABASE_URL")
+    //   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+    referentialIntegrity = "prisma"
 }
 
 model Example {
@@ -45,11 +48,14 @@ model Session {
 model User {
     id            String    @id @default(cuid())
     name          String?
-    email         String?   @unique
+    password      String
+    email         String    @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+
+    loginToken loginToken[]
 }
 
 model VerificationToken {
@@ -58,4 +64,12 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model loginToken {
+    id        String   @unique @default(uuid())
+    createdAt DateTime @default(now())
+    user      User     @relation(fields: [userEmail], references: [email])
+    userEmail String
+    redirect  String   @default("/")
 }
