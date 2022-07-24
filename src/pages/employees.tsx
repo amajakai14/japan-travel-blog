@@ -147,14 +147,13 @@ function EmployeesPage() {
       {job &&
         job.map((j, index) => {
           return (
-            <div>
+            <div key={`jobContainer${index}`}>
               <div key={`comp_${index}`}>ชื่อบริษัท{j.company_name}</div>
               <div key={`jd_${index}`}>รายละเอียดงาน {j.job_description}</div>
               <div key={`wage_offer${index}`}>ค่าแรง:{j.wage}</div>
               <div
                 key={`company_address${index}`}
               >{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} ตำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
-              <div></div>
             </div>
           );
         })}
