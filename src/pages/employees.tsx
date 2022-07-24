@@ -69,11 +69,6 @@ function EmployeesPage() {
     const JobType: string = (
       document.getElementById("job_type") as HTMLSelectElement
     )?.value;
-    console.log(parseInt(ZipCode));
-    console.log(Province);
-    console.log(Amphoe);
-    console.log(District);
-    console.log(parseInt(JobType));
     const inputData: SearchCondition = {
       zipcode: parseInt(ZipCode),
       province: Province,
@@ -150,13 +145,15 @@ function EmployeesPage() {
       {/* งาน */}
       {job.length === 0 ? <div>Work not Found!</div> : <div>Found a Job!</div>}
       {job &&
-        job.map((j) => {
+        job.map((j, index) => {
           return (
             <div>
-              <div>ชื่อบริษัท{j.company_name}</div>
-              <div>รายละเอียดงาน {j.job_description}</div>
-              <div>ค่าแรง:{j.wage}</div>
-              <div>{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} ตำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
+              <div key={`comp_${index}`}>ชื่อบริษัท{j.company_name}</div>
+              <div key={`jd_${index}`}>รายละเอียดงาน {j.job_description}</div>
+              <div key={`wage_offer${index}`}>ค่าแรง:{j.wage}</div>
+              <div
+                key={`company_address${index}`}
+              >{`ข้อมูลที่อยู่บริษัท จังหวัด:${j.province} ตำบล:${j.district} อำเภอ:${j.amphoe}`}</div>
               <div></div>
             </div>
           );
